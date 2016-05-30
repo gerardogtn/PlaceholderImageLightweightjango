@@ -43,8 +43,10 @@ from PIL import Image, ImageDraw
 from django import forms
 from django.conf.urls import url
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.core.wsgi import get_wsgi_application
 from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import render
 
 class ImageForm(forms.Form):
     height = forms.IntegerField(min_value=1, max_value=2000)
@@ -76,7 +78,11 @@ class ImageForm(forms.Form):
         cache.set(key, content, HOUR_LENGTH)
 
 def index(request):
-    return HttpResponse('Hello world!')
+    example = reverse('placeholder', kwargs={'width': 50, 'height': 50})
+    context = {
+        'example': request.build_absolute_uri(example)
+    }
+    return render(request, 'home.html', context)
 
 ## TODO: Add implementation.
 def placeholder(request, width, height):
