@@ -1,7 +1,10 @@
+import hashlib
 import os
 import sys
 
 from django.conf import settings
+
+BASE_DIR = os.path.dirname(__file__)
 
 ## Read debug environment variable.
 DEBUG = os.environ.get('DEBUG', 'on') == 'on'
@@ -20,6 +23,19 @@ settings.configure(
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
     ),
+    INSTALLED_APPS=(
+        'django.contrib.staticfiles',
+    ),
+    TEMPLATES=(
+        {
+            'BACKEND': 'django.template.backends.django.DjangoTemplates',
+            'DIRS': (os.path.join(BASE_DIR, 'templates'),),
+        },
+    ),
+    STATICFILES_DIRS=(
+        os.path.join(BASE_DIR, 'static'),
+    ),
+    STATIC_URL='/static/',
 )
 
 from io import BytesIO
