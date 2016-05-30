@@ -22,16 +22,25 @@ settings.configure(
     ),
 )
 
+from django import forms
 from django.conf.urls import url
 from django.core.wsgi import get_wsgi_application
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
+
+class ImageForm(forms.Form):
+    height = forms.IntegerField(min_value=1, max_value=2000)
+    width = forms.IntegerField(min_value=1, max_value=2000)
 
 def index(request):
     return HttpResponse('Hello world!')
 
 ## TODO: Add implementation.
 def placeholder(request, width, height):
-    return HttpResponse('Ok')
+    form = ImageForm({'height': height, 'width': width})
+    if form.is_valid():
+        return HttpResponse('Ok')
+    else:
+        return HttpResponseBadRequest('Invalid Image request')
 
 application = get_wsgi_application()
 
