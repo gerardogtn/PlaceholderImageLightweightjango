@@ -29,10 +29,15 @@ from django.http import HttpResponse
 def index(request):
     return HttpResponse('Hello world!')
 
+## TODO: Add implementation.
+def placeholder(request, width, height):
+    return HttpResponse('Ok')
+
 application = get_wsgi_application()
 
 urlpatterns = (
-    url(r'^$', index),
+    url(r'^image/(?P<width>[0-9]+)x(?P<height>[0-9]+)/$', placeholder, name='placeholder'),
+    url(r'^$', index, name='homepage'),
 )
 
 if __name__ == '__main__':
