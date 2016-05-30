@@ -26,6 +26,7 @@ from io import BytesIO
 from PIL import Image, ImageDraw
 from django import forms
 from django.conf.urls import url
+from django.core.cache import cache
 from django.core.wsgi import get_wsgi_application
 from django.http import HttpResponse, HttpResponseBadRequest
 
@@ -34,13 +35,14 @@ class ImageForm(forms.Form):
     width = forms.IntegerField(min_value=1, max_value=2000)
 
     def generate(self, image_format='PNG'):
-        height = self.cleaned_data['height']
         width = self.cleaned_data['width']
+        height = self.cleaned_data['height']
         image = Image.new('RGB', (width, height))
         content = BytesIO()
         self.drawText(width, height, image)
         image.save(content, image_format)
         content.seek(0)
+        self.addCaching(width, height, image_format, content)
         return content
 
     def drawText(self, width, height, image):
@@ -51,6 +53,11 @@ class ImageForm(forms.Form):
             leftCoor = (width - textWidth) // 2
             topCoor = (height - textHeight) // 2
             draw.text((leftCoor, topCoor), text, fill=(255, 255, 255))
+
+    def addCaching(self, width, height, image_format, content):
+        key = '{}.{}.{}'.format(width, height, image_format)
+        HOUR_LENGTH = 60*60
+        cache.set(key, content, HOUR_LENGTH)
 
 def index(request):
     return HttpResponse('Hello world!')
