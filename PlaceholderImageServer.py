@@ -23,7 +23,7 @@ settings.configure(
 )
 
 from io import BytesIO
-from PIL import Image
+from PIL import Image, ImageDraw
 from django import forms
 from django.conf.urls import url
 from django.core.wsgi import get_wsgi_application
@@ -38,10 +38,19 @@ class ImageForm(forms.Form):
         width = self.cleaned_data['width']
         image = Image.new('RGB', (width, height))
         content = BytesIO()
+        self.drawText(width, height, image)
         image.save(content, image_format)
         content.seek(0)
         return content
 
+    def drawText(self, width, height, image):
+        draw = ImageDraw.Draw(image)
+        text = '{} x {}'.format(width, height)
+        textWidth, textHeight = draw.textsize(text)
+        if (textWidth < width and textHeight < height):
+            leftCoor = (width - textWidth) // 2
+            topCoor = (height - textHeight) // 2
+            draw.text((leftCoor, topCoor), text, fill=(255, 255, 255))
 
 def index(request):
     return HttpResponse('Hello world!')
